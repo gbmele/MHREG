@@ -1,9 +1,7 @@
 include "globals.mzn";
 include "table.mzn";
-%include "reg_data.dzn";
 
 
-%this calendar stuff payweek stuff payfornight stuff
 int: monday     = 1;   %% why did u do this??    
 int: tuesday    = 2;
 int: wednesday  = 3;
