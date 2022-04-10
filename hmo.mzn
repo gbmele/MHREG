@@ -1,39 +1,10 @@
-%          M	T	W	T	F	S	S
-/*1	p	o	o	o	n	n	n */  string: w1 =  "( p o o o n n n)";
-/*2	o	o	o	a	a	a	a */  string: w2 =  "( o o o a a a a)";
-/*3	o	a	a	a	a	o	o */  string: w3 =  "( o a a a a o o)"; 
-/*4	o	o	p	p	o	p	p */  string: w4 =  "( o o p p o p p)";
-/*5	p	p	p	o	p	o	o */  string: w5 =  "( p p p o p o o)";
-/*6	n	n	n	n	o	o	o */  string: w6 =  "( n n n n o o o)";
-/*7	o	o	p	o	a	a	a */  string: w7 =  "( o o p o a a a)";
-/*8	p	o	o	o	p	p	p */  string: w8 =  "( p o o o p p p)";
-/*9	o	a	a	a	a	o	o */  string: w9 =  "( o a a a a o o)";
-/*10	p	p	p	p	o	o	o */  string: w10 = "( p p p p o o o)";
-/*11	p	o	o	o	n	n	n */  string: w11 = "( p o o o n n n)";
-/*12	o	o	o	a	a	a	a */  string: w12 = "( o o o a a a a)";
-/*13	a	o	a	a	a	o	o */  string: w13 = "( a o a a a o o)";
-/*14	a	a	o	o	o	p	p */  string: w14 = "( a a o o o p p)";
-/*15	o	p	p	p	p	o	o */  string: w15 = "( o p p p p o o)";
-/*16	n	n	n	n	o	o	o */  string: w16 = "( n n n n o o o)";
-/*17	o	o	a	o	p	p	p */  string: w17 = "( o o a o p p p)";
-/*18	p	p	p	p	o	o	o */  string: w18 = "( p p p p o o o)";
-/*19	o	a	a	o	o	a	a */  string: w19 = "( o a a o o a a)";
-/*20	p	p	p	o	p	o	o */  string: w20 = "( p p p o p o o)";
-/*
-count
-
-a	2	4	5	5	6	4	4
-p	7	5	7	4	5	4	4
-n	2	2	2	2	2	2	2
-*/
-							
 
 
 include "globals.mzn";
 include "table.mzn";
 
-
-int: monday     = 1;   %% why did u do this??    
+                       %% day mod 7 = 1 is monday
+int: monday     = 1;   %%  Nurse rostering benchmark website has first day of roster numbered 1.
 int: tuesday    = 2;
 int: wednesday  = 3;
 int: thursday   = 4;
@@ -58,7 +29,7 @@ int: wk13_mon = 85;   set of int: wk13 = 85..91;
 
 int: WEEKS = 13;
 int: DAYS = WEEKS * 7;
-set of int: days = 1..DAYS;   %%13 weeks
+set of int: days = 1..DAYS;  
 enum shifts = {a,p,n,o,l};   %%am pm night off leave
 
 enum docs ={A,B,C,D,E,F,G,H,J,K,L,M,N,O,P,Q,R,S,T,U,V,W};   %,L1,L2,L3,L4;  
@@ -107,7 +78,7 @@ predicate shifts_per_fortnight (docs: doc,int: num ) =     %%THIS IS PAY FORTNIG
         global_cardinality(roster[doc,43..56], [o], [14-num])  /\
         count( roster[doc,57..70],o, 14-num));
 
-predicate shifts_per_block (docs: doc,shifts: sh, int: num ) =     %%THIS IS PAY FORTNIGHT
+predicate shifts_per_block (docs: doc,shifts: sh, int: num ) =     
         ((count(roster[doc, 1..28], sh,num)) /\
         (count(roster[doc, 29..56],sh,num)) /\
         (count(roster[doc, 1..28], sh,num)));
@@ -136,48 +107,153 @@ predicate no_mon_after_sun (docs: doc) =
         (on_shift(doc,d) -> off_shift(doc,d+1));
         
         
-predicate no_nights_next_three_weeks(docs:doc)=
-  forall(d in 1..DAYS-21)
-        (on_night(doc,d) ->(no_night(doc,d+21)));         
 
-predicate no_nights_next_two_weeks(docs:doc)=
-  forall(d in 1..DAYS-14)
-        (on_night(doc,d) ->(no_night(doc,d+14)));         
+%%%%%%%%%%
 
-predicate no_nights_next_week(docs:doc)=
-  forall(d in 1..DAYS-7)
-        (on_night(doc,d) ->(no_night(doc,d+7)));         
-  
-predicate no_nights(docs: doc) =
-    no_nights_next_week(doc) ;%  /\ no_nights_next_two_weeks(doc) ; %/\ no_nights_next_three_weeks(doc);           
+
+predicate two_days_off_after_nights(docs:doc)=
+  forall( d in 1..DAYS-6)
+    (   (if  (off_shift(doc,d) /\on_night(doc,d+1) /\ on_night(doc,d+2) /\ on_night(doc,d+3)) then  (off_shift(doc,d+4) /\ off_shift(doc,d+5)) else true endif)) ;% \/
+%        (if  (on_night(doc,d) /\ on_night(doc,d+1) /\ on_night(doc,d+2) /\ on_night(doc,d+3)) then  (off_shift(doc,d+4) /\ off_shift(doc,d+5)) else true endif));
+
+
+predicate two_days_off_after_four_shifts(docs:doc, shifts:s) =
+     forall(d in 1..DAYS-6)
+         ((roster[doc,d]=s /\ roster[doc,d+1]=s /\ roster[doc,d+2]=s /\ roster[doc,d+4]=s) -> roster[doc,d+5]=o /\ roster[doc,d+6]=o);
+
+predicate one_day_off_after_four_shifts(docs:doc, shifts:s) =
+     forall(d in 1..DAYS-5)
+         ((roster[doc,d]=s /\ roster[doc,d+1]=s /\ roster[doc,d+2]=s /\ roster[doc,d+4]=s) -> roster[doc,d+5]=o);
+
+
+
+
 
 string: s1 = "(p o o o n n n | o o o a a a a | n n n n o o o | p p p p o o o | o p p p p o o |o o o p p p p | o o p p o p p | o a a a a o o | o o a a o a a | o a a o o p p | o a o o o p p p | o a a a a o o | a a a a o o o  | o o p p o a a  | a o p p p o o | a o o o n n n | o a o o p p p   )*";
 
-constraint forall (doc in {A,B,C,D,E,F,G,H,J,K,L,M} ,day in days) 
-  ((alloc[doc,day]=roster[doc,day]) /\
-  (regular(roster[doc,..],s1)) /\
-  shifts_per_week(doc,4) /\ no_mon_after_sun(doc)  /\ no_consec_weekends(doc)) ;  % /\ no_nights(doc)); 
+string: s2 = "( o p o o n n n |n n n n o o o | o o a a o a a |o o o a a a a | a a a a o o o | o a a a a o o  |a a o a a o o | o a a p p o o | o o a a o p p |o o p p o a a | o p p p p o o | p p o p p o o | o o o p p p p p | p p p p o o o | o o p p o p p| p p | a a | o o o o o)*";
+
+
+%constraint forall (doc in {A,B,C,D,E,F,G,H,J,K} ,day in days) 
+%  ((alloc[doc,day]=roster[doc,day]) /\
+%  (regular(roster[doc,..],s2)) /\
+%  shifts_per_week(doc,4)); % /\ no_consec_weekends(doc));  % /\ no_mon_after_sun(doc)  /\ no_consec_weekends(doc)) ;  % /\ no_nights(doc)); 
   
-      
-%%SET UP NIGHTS  
-constraint forall(doc in {A,B,C,D,E,F,G,H,J,K,L,M}) 
+
+   /*   
+constraint forall(doc in {B,C}) 
            % (global_cardinality_low_up([roster[doc,d] | d in  1..DAYS],[n,a],[9,16],[15,25])      /\
-            ((global_cardinality_low_up([roster[doc,d] | d in  1..28]  ,[n,a,p],   [3,4,4], [4,6,6]        ))    /\
-             (global_cardinality_low_up([roster[doc,d] | d in 29..56]  ,[n,a,p],   [3,4,4], [4,6,6]        ))    /\
-             (global_cardinality_low_up([roster[doc,d] | d in 57..91]  ,[n,a,p],   [3,4,4], [4,8,8])));
+            ((global_cardinality_low_up([roster[doc,d] | d in  1..28]  ,[n,a],   [3,4], [4,8]        ))    /\
+             (global_cardinality_low_up([roster[doc,d] | d in 29..56]  ,[n,a],   [3,4], [4,8]        ))    /\
+             (global_cardinality_low_up([roster[doc,d] | d in 57..91]  ,[n,a],   [3,6], [4,8])));
+       
+*/   
+
+
+%predicate TWO_IN_FOUR(docs:doc) -
+%          forall (d in {1,29})
+%           ((global_cardinality_low_up([roster[doc,d] | d in  1..DAYS where d mod 7 = saturday],[n,a,p], [1,1,1],[3,3,3]))  /\
+          
+          
+
+predicate N_A_AP_P(docs:doc)=
+    forall (d in {1,29,57}) 
+         ((global_cardinality_low_up(roster[doc,d..d+6],[n],[3],[4])) /\
+         (count(roster[doc,d+7..d+13],a,4)) /\
+         (count(roster[doc,d+14..d+20],p,2)) /\ 
+         (count(roster[doc,d+21..d+27],p,4)) /\
+                                
+         (if d = 57 then 
+                 global_cardinality_low_up(roster[doc,d+28..d+34],[n],[3],[4])
+                 else
+                 true
+          endif));
+
+predicate A_AP_P_N(docs:doc)=
+    forall (d in {1,29,57}) 
+         ((count(roster[doc,d..d+6],a,4)) /\
+         (count(roster[doc,d+7..d+13],p,2)) /\ 
+         (count(roster[doc,d+14..d+20],p,4)) /\
+         (global_cardinality_low_up(roster[doc,d+21..d+27],[n],[3],[4])) /\
+         
+         (if d = 57 then
+                count(roster[doc,d+28..d+34],a,4)
+          else true
+          endif));
+                
+                
+                
+                
+predicate AP_P_N_A(docs:doc)=
+    forall (d in {1,29,57}) 
+         ((count(roster[doc,d..d+6],p,2)) /\ 
+         (count(roster[doc,d+7..d+13],p,4)) /\
+         (global_cardinality_low_up(roster[doc,d+14..d+20],[n],[3],[4]))/\
+        (count(roster[doc,d+21..d+27],a,4)) /\
+                          
+         
+         (if d = 57 then
+          count(roster[doc,d+28..d+34],p,2)
+          else true
+          endif));
+
         
+ 
+predicate P_N_A_AP(docs:doc)=
+    forall (d in {1,29,57}) 
+          ((count(roster[doc,d..d+6],p,4)) /\
+          (global_cardinality_low_up(roster[doc,d+7..d+13],[n],[3],[4]))/\
+          (count(roster[doc,d+14..d+20],a,4)) /\
+          (count(roster[doc,d+21..d+27],p,2)) /\
+          
+             (if d = 57 then
+                count(roster[doc,d+28..d+34],p,4)
+          else true
+          endif));
+
+        
+constraint forall(doc in {A,B,C,D,E,F,G,H,J,K,L}) 
+           ((global_cardinality([roster[doc,d] | d in  1..28 where d mod 7 = saturday],[n,a,p],[1,1,0])) \/
+           (global_cardinality([roster[doc,d] | d in  1..28  where d mod 7 = saturday],[n,p,a],[1,1,0]))  \/
+           (global_cardinality([roster[doc,d] | d in  1..28  where d mod 7 = saturday],[p,a,n],[1,1,0])));
+           
+constraint forall(doc in {A,B,C,D,E,F,G,H,J,K,L}) 
+           ((global_cardinality([roster[doc,d] | d in  29..56 where d mod 7 = saturday],[n,a,p],[1,1,0])) \/
+           (global_cardinality([roster[doc,d] | d in  29..56  where d mod 7 = saturday],[n,p,a],[1,1,0]))  \/
+           (global_cardinality([roster[doc,d] | d in  29..56  where d mod 7 = saturday],[p,a,n],[1,1,0])));
+
+constraint forall(doc in {A,B,C,D,E,F,G,H,J,K,L}) 
+           ((global_cardinality([roster[doc,d] | d in  57..91  where d mod 7 = saturday],[n,a,p],[1,1,0],[1,1,1])) \/
+           (global_cardinality([roster[doc,d] | d in   57..91  where d mod 7 = saturday],[n,p,a],[1,1,0],[1,1,1]))  \/
+           (global_cardinality([roster[doc,d] | d in   57..91  where d mod 7 = saturday],[p,a,n],[1,1,0],[1,1,1])));
+
+
+%constraint forall(doc in {A,B,C,D,E,F,G,H,J,K,L}) 
+%           ((global_cardinality([roster[doc,d] | d in  57..91 where d mod 7 = saturday], [n,a,p],[1,1,0],[1,2,0])) \/
+%           (global_cardinality([roster[doc,d] | d in  57..91  where d mod 7 = saturday], [n,p,a],[1,1,0],[1,2,0]))  \/
+%           (global_cardinality([roster[doc,d] | d in  57..91  where d mod 7 = saturday], [p,a,n],[1,1,0],[2,1,0])));
+           
+           
+           
+constraint forall (doc in {A,B,C,D,E,F,G,H,J,K,L} , day in days)
+        ((regular(roster[doc,..],s2)) /\
+          (alloc[doc,day]=roster[doc,day]) /\
+         (shifts_per_week(doc,4)) /\   %leavig this out slows it right down
+         two_days_off_after_nights(doc) /\ /* two_days_off_after_four_shifts(doc,p)*/   one_day_off_after_four_shifts(doc,a) /\one_day_off_after_four_shifts(doc,p) /\
+        (N_A_AP_P(doc) \/ A_AP_P_N(doc) \/ AP_P_N_A(doc) \/ P_N_A_AP(doc)));  
+
 
 
 
 %%the final fly
 
-constraint forall(d in days where d mod 7 = monday  )   (global_cardinality_low_up(alloc[..,d], [a,p,n,l],   [4, 3,4,0   ],   [4, 5,4,0   ] )); %tue
-constraint forall(d in days where d mod 7 = tuesday  )  (global_cardinality_low_up(alloc[..,d], [a,p,n,l],   [4, 3,4,0   ],   [4, 5,4,0   ] )); %tue
-constraint forall(d in days where d mod 7 = wednesday)  (global_cardinality_low_up(alloc[..,d], [a,p,n,l],   [4, 3,4,0   ],   [4, 5,4,0   ] )); %wed
-constraint forall(d in days where d mod 7 = thursday )  (global_cardinality_low_up(alloc[..,d], [a,p,n,l],   [4, 3,4,0   ],   [4, 5,4,0   ] )); %thu
-constraint forall(d in days where d mod 7 = friday   )  (global_cardinality_low_up(alloc[..,d], [a,p,n,l],   [4, 3,4,0   ],   [4, 5,4,0   ] )); %fri
-constraint forall(d in days where d mod 7 = saturday )  (global_cardinality_low_up(alloc[..,d], [a,p,n,l],   [3, 3,4,0   ],   [3, 3,4,0   ] )); %sat 
-constraint forall(d in days where d mod 7 = sunday   )  (global_cardinality_low_up(alloc[..,d], [a,p,n,l],   [3, 3,4,0   ],   [3, 3,4,0   ] )); %sun
+constraint forall(d in days where d mod 7 = monday  )   (global_cardinality_low_up(alloc[..,d], [a,p,n,l],   [3, 3,2,0   ],   [4, 5,2,0   ] )); %tue
+constraint forall(d in days where d mod 7 = tuesday  )  (global_cardinality_low_up(alloc[..,d], [a,p,n,l],   [3, 3,2,0   ],   [4, 5,2,0   ] )); %tue
+constraint forall(d in days where d mod 7 = wednesday)  (global_cardinality_low_up(alloc[..,d], [a,p,n,l],   [3, 3,2,0   ],   [4, 5,2,0   ] )); %wed
+constraint forall(d in days where d mod 7 = thursday )  (global_cardinality_low_up(alloc[..,d], [a,p,n,l],   [3, 3,2,0   ],   [4, 5,2,0   ] )); %thu
+constraint forall(d in days where d mod 7 = friday   )  (global_cardinality_low_up(alloc[..,d], [a,p,n,l],   [3, 3,2,0   ],   [4, 5,2,0   ] )); %fri
+constraint forall(d in days where d mod 7 = saturday )  (global_cardinality_low_up(alloc[..,d], [a,p,n,l],   [3, 3,2,0   ],   [3, 3,2,0   ] )); %sat 
+constraint forall(d in days where d mod 7 = sunday   )  (global_cardinality_low_up(alloc[..,d], [a,p,n,l],   [3, 3,2,0   ],   [3, 3,2,0   ] )); %sun
  
 
                                                 
@@ -194,4 +270,3 @@ output [show(count(alloc[..,day],n)) ++ " " ++ if day mod 7 = sunday then "|" el
 output [show(count(alloc[..,day],l)) ++ " " ++ if day mod 7 = sunday then "|" else "" endif  ++ if day = DAYS then "l" else "" endif | day in days] ;output["\n"];
 
 output ["\(doc)   " ++ show(count(roster[doc,..],a)) ++ " " ++ show(count(roster[doc,..],p)) ++  " " ++ show(count(roster[doc,..],n)) ++ "\n" | doc in docs  ];
-
