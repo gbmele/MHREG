@@ -1,5 +1,3 @@
-
-
 include "globals.mzn";
 include "table.mzn";
 
@@ -131,7 +129,7 @@ predicate one_day_off_after_four_shifts(docs:doc, shifts:s) =
 
 string: s1 = "(p o o o n n n | o o o a a a a | n n n n o o o | p p p p o o o | o p p p p o o |o o o p p p p | o o p p o p p | o a a a a o o | o o a a o a a | o a a o o p p | o a o o o p p p | o a a a a o o | a a a a o o o  | o o p p o a a  | a o p p p o o | a o o o n n n | o a o o p p p   )*";
 
-string: s2 = "( o p o o n n n |n n n n o o o | o o a a o a a |o o o a a a a | a a a a o o o | o a a a a o o  |a a o a a o o | o a a p p o o | o o a a o p p |o o p p o a a | o p p p p o o | p p o p p o o | o o o p p p p p | p p p p o o o | o o p p o p p| p p | a a | o o o o o)*";
+string: s2 = "( o p o o n n n |n n n n o o o | o o a a o a a |o o o a a a a | a a a a o o o | o a a a a o o  |a a o a a o o | o a a p p o o | o o a a o p p |o o p p o a a | o p p p p o o | p p o p p o o | o o o p p p p p | p p p p o o o | o o p p o p p )*";
 
 
 %constraint forall (doc in {A,B,C,D,E,F,G,H,J,K} ,day in days) 
@@ -212,34 +210,38 @@ predicate P_N_A_AP(docs:doc)=
           endif));
 
         
-constraint forall(doc in {A,B,C,D,E,F,G,H,J,K,L}) 
+constraint forall(doc in {A,B,C,D,E,F,G,H,J,K}) 
            ((global_cardinality([roster[doc,d] | d in  1..28 where d mod 7 = saturday],[n,a,p],[1,1,0])) \/
            (global_cardinality([roster[doc,d] | d in  1..28  where d mod 7 = saturday],[n,p,a],[1,1,0]))  \/
            (global_cardinality([roster[doc,d] | d in  1..28  where d mod 7 = saturday],[p,a,n],[1,1,0])));
            
-constraint forall(doc in {A,B,C,D,E,F,G,H,J,K,L}) 
+constraint forall(doc in {A,B,C,D,E,F,G,H,J,K}) 
            ((global_cardinality([roster[doc,d] | d in  29..56 where d mod 7 = saturday],[n,a,p],[1,1,0])) \/
            (global_cardinality([roster[doc,d] | d in  29..56  where d mod 7 = saturday],[n,p,a],[1,1,0]))  \/
            (global_cardinality([roster[doc,d] | d in  29..56  where d mod 7 = saturday],[p,a,n],[1,1,0])));
 
-constraint forall(doc in {A,B,C,D,E,F,G,H,J,K,L}) 
-           ((global_cardinality([roster[doc,d] | d in  57..91  where d mod 7 = saturday],[n,a,p],[1,1,0],[1,1,1])) \/
-           (global_cardinality([roster[doc,d] | d in   57..91  where d mod 7 = saturday],[n,p,a],[1,1,0],[1,1,1]))  \/
-           (global_cardinality([roster[doc,d] | d in   57..91  where d mod 7 = saturday],[p,a,n],[1,1,0],[1,1,1])));
-
-
 %constraint forall(doc in {A,B,C,D,E,F,G,H,J,K,L}) 
-%           ((global_cardinality([roster[doc,d] | d in  57..91 where d mod 7 = saturday], [n,a,p],[1,1,0],[1,2,0])) \/
-%           (global_cardinality([roster[doc,d] | d in  57..91  where d mod 7 = saturday], [n,p,a],[1,1,0],[1,2,0]))  \/
-%           (global_cardinality([roster[doc,d] | d in  57..91  where d mod 7 = saturday], [p,a,n],[1,1,0],[2,1,0])));
-           
-           
-           
-constraint forall (doc in {A,B,C,D,E,F,G,H,J,K,L} , day in days)
+%           ((global_cardinality_low_up([roster[doc,d] | d in  57..91  where d mod 7 = saturday],[n,a,p],[1,1,0],[1,1,1])) \/
+%           (global_cardinality_low_up([roster[doc,d] | d in   57..91  where d mod 7 = saturday],[n,p,a],[1,1,0],[1,1,1]))  \/
+%           (global_cardinality_low_up([roster[doc,d] | d in   57..91  where d mod 7 = saturday],[p,a,n],[1,1,0],[1,1,1])));
+
+
+%constraint forall (i in on_call_staff) ((sum (j in weeks) (mon_oncall[i,j]==on_call) <=4));
+%constraint forall (i in on_call_staff) ((sum (j in weeks) (tue_oncall[i,j]==on_call) <=4));
+
+
+constraint forall(doc in {A,B,C,D,E,F,G,H,J,K}) 
+    (sum(d in 57..84 where d mod 7 = saturday) (roster[doc,d] =a) + 
+     sum(d in 57..84 where d mod 7 = saturday) (roster[doc,d] =p)  +
+     sum(d in 57..84 where d mod 7 = saturday) (roster[doc,d] =n) <=2);
+    
+                
+                                        
+constraint forall (doc in {A,B,C,D,E,F,G,H,J,K,L,M,N,O,P} , day in days)
         ((regular(roster[doc,..],s2)) /\
           (alloc[doc,day]=roster[doc,day]) /\
          (shifts_per_week(doc,4)) /\   %leavig this out slows it right down
-         two_days_off_after_nights(doc) /\ /* two_days_off_after_four_shifts(doc,p)*/   one_day_off_after_four_shifts(doc,a) /\one_day_off_after_four_shifts(doc,p) /\
+         %$two_days_off_after_nights(doc) /\ /* two_days_off_after_four_shifts(doc,p)*/   % one_day_off_after_four_shifts(doc,a) /\one_day_off_after_four_shifts(doc,p) /\
         (N_A_AP_P(doc) \/ A_AP_P_N(doc) \/ AP_P_N_A(doc) \/ P_N_A_AP(doc)));  
 
 
