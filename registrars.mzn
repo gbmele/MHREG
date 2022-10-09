@@ -6,61 +6,83 @@ include "registrars_term4.mzn";
 
 include "global_calendar.mzn";
 
-int: DAYS=91; %%13 weeks....
 
-
+%%include "data.csv";
 
 enum  regs = {r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20};
 
 
-function shifts: get_shift(int:sh) = 
-                 if     sh = 0 then  off
+int: pftam = 6;
+
+
+%DISPATCH
+
+function shifts: get_shift(int:sh) =    
+                     if sh = 0 then off       
                  elseif sh = 1 then a81730
                  elseif sh = 2 then p142330
                  elseif sh = 3 then n230830
                  elseif sh = 4 then leave
                  elseif sh = 5 then trn1217
+                 elseif sh = 6 then pft812
+                 elseif sh = 7 then p172330
+                 elseif sh = 8 then rt812
                  else off
-                 endif
-                 ;
+                 endif;
 
-int: days = 14;
+int: days = 13 *7;
 array[regs,1..days] of var 0..10: roster;
 
-constraint forall(reg in regs, day in wk1)  (roster[reg,day]=week1[reg,day]);
-constraint forall(reg in regs, day in wk2)  (roster[reg,day]=week2[reg,day]);
+constraint forall(reg in regs, day in wk1 )  (roster[reg,day]= week1 [reg,day]);
+constraint forall(reg in regs, day in wk2 )  (roster[reg,day]= week2 [reg,day]);
+constraint forall(reg in regs, day in wk3 )  (roster[reg,day]= week3 [reg,day]);
+constraint forall(reg in regs, day in wk4 )  (roster[reg,day]= week4 [reg,day]);
+constraint forall(reg in regs, day in wk5 )  (roster[reg,day]= week5 [reg,day]);
+constraint forall(reg in regs, day in wk6 )  (roster[reg,day]= week6 [reg,day]);
+constraint forall(reg in regs, day in wk7 )  (roster[reg,day]= week7 [reg,day]);
+constraint forall(reg in regs, day in wk8 )  (roster[reg,day]= week8 [reg,day]);
+constraint forall(reg in regs, day in wk9 )  (roster[reg,day]= week9 [reg,day]);
+constraint forall(reg in regs, day in wk10)  (roster[reg,day]= week10[reg,day]);
+constraint forall(reg in regs, day in wk11)  (roster[reg,day]= week11[reg,day]);
+constraint forall(reg in regs, day in wk12)  (roster[reg,day]= week12[reg,day]);
+constraint forall(reg in regs, day in wk13)  (roster[reg,day]= week13[reg,day]);
 
 
 
 
 
-output[show(REGISTRARS[reg,emp_num]) ++ " " ++  show(REGISTRARS[reg,reg_role]) ++ "\n" | reg in regs];output["\n\n"];
+output[show(REGISTRARS[reg,emp_num]) ++ " " ++  show(REGISTRARS[reg,reg_role]) ++  "   "  ++ show(REGISTRARS[reg,FullPartTime]) ++ "\n" | reg in regs];output["\n\n"];
 
-output[show(sh) ++ " \t" ++ show(REG_SHIFTS[sh,1]) ++ "\n" | sh in shifts];
+output[show(sh) ++ " \t" ++ show(REG_SHIFTS[sh,shift_description]) ++ "\n" | sh in shifts];
 
 output["\n\n"];
 
-output[show(d) ++ " " ++ show(DATES[d]) ++ "\n" | d in 1..DAYS]; 
+output[show(d) ++ " " ++ show(DATES[d]) ++ "\n" | d in 1..days]; 
 
-/*
-%%/////////////////////////////////////////////////////////
-%%/////////////////////////////////////////////////////////
+
+output[show(roster[reg,day]) ++ " " ++ if day mod 7 = 0 then "||" else "" endif ++ if day = days then "\n" else "" endif  |reg in regs, day in 1..days];
+
+%%%%THE WHOLE ROSTER>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 output[                                      
                       show(REGISTRARS[reg,emp_num])                    ++ sep ++ 
                       show(DATES[d])                                   ++ sep ++ 
                       show(area)                                       ++ sep ++
-                      show(REG_SHIFTS[get_shift(fix(week1[reg,d])),1]) ++ sep ++   %SHIft
-                      show(REGISTRARS[reg,2])                          ++ sep ++
-                      show(REG_SHIFTS[get_shift(fix(week1[reg,d])),2]) ++ sep ++
-                      show(REG_SHIFTS[get_shift(fix(week1[reg,d])),3]) ++ sep ++
-                      show(REG_SHIFTS[get_shift(fix(week1[reg,d])),4]) ++ sep ++
-                      show(REG_SHIFTS[get_shift(fix(week1[reg,d])),5]) ++ sep ++
-                      show(REG_SHIFTS[get_shift(fix(week1[reg,d])),6]) ++ sep ++                      
+                      show(REG_SHIFTS[get_shift(fix(roster[reg,d])),1]) ++ sep ++   %SHIft
+                      show(REGISTRARS[reg,reg_role])                    ++ sep ++
+                      show(REG_SHIFTS[get_shift(fix(roster[reg,d])),2]) ++ sep ++
+                      show(REG_SHIFTS[get_shift(fix(roster[reg,d])),3]) ++ sep ++
+                      show(REG_SHIFTS[get_shift(fix(roster[reg,d])),4]) ++ sep ++
+                      show(REG_SHIFTS[get_shift(fix(roster[reg,d])),5]) ++ sep ++
+                      show(REG_SHIFTS[get_shift(fix(roster[reg,d])),6]) ++ sep ++                      
                       dag_end ++ "\n"
                       
-                      |reg in regs, d in 1..7];
-output[  if (d mod 7 = wednesday /\ fix(week1[reg,d]) in {shiftoff})
-          then 
+                      |reg in regs, d in 1..days];
+                      
+                      
+%%FULL TIMER TEEACHING TIME                 
+output[  if (d mod 7 = wednesday /\ fix(roster[reg,d]) in {shiftoff,pftam,5,6,7,8,9,10}   /\ fix(REGISTRARS[reg,FullPartTime]="FT"))
+                       then 
                        show(REGISTRARS[reg,emp_num])           ++ sep ++ 
                        show(DATES[d])                          ++ sep ++ 
                        show(area)                              ++ sep ++
@@ -72,20 +94,34 @@ output[  if (d mod 7 = wednesday /\ fix(week1[reg,d]) in {shiftoff})
                        show(REG_SHIFTS[trn1217,5])             ++ sep ++
                        show(REG_SHIFTS[trn1217,6])             ++ sep ++
                        dag_end ++ "\n" 
-                       
-          else "" endif 
+                       else "" endif 
           
-          | reg in regs,d in 1..7];
-%%/////////////////////////////////
-%%/////////////////////////////////
+          | reg in regs,d in 1..days];
+%%PART TIMER TEACHING TIME
+output[  if (d mod 7 = wednesday /\ fix(roster[reg,d]) in {shiftoff,pftam,5,6,7,8,9,10}   /\ fix(REGISTRARS[reg,FullPartTime]="PT"))
+                       then 
+                       show(REGISTRARS[reg,emp_num])           ++ sep ++ 
+                       show(DATES[d])                          ++ sep ++ 
+                       show(area)                              ++ sep ++
+                       show(REG_SHIFTS[trn121430,1])             ++ sep ++
+                       show(REGISTRARS[reg,2])                 ++ sep ++
+                       show(REG_SHIFTS[trn121430,2])             ++ sep ++
+                       show(REG_SHIFTS[trn121430,3])             ++ sep ++
+                       show(REG_SHIFTS[trn121430,4])             ++ sep ++
+                       show(REG_SHIFTS[trn121430,5])             ++ sep ++
+                       show(REG_SHIFTS[trn121430,6])             ++ sep ++
+                       dag_end ++ "\n" 
+                       else "" endif 
+          
+          | reg in regs,d in 1..days];
 
-*/
-
-
-
-output[show(roster[reg,day]) ++ " " ++ if day = 14 then "\n" else "" endif |reg in regs, day in 1..14];
-
-%%%%THE WHOLE ROSTER>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+output["\n\n\n\n\n\n===========TESTING SHIFTS PRIOR TO AND AFTER TEACHING==========================\n"];
 
 output[                                      
                       show(REGISTRARS[reg,emp_num])                    ++ sep ++ 
@@ -100,9 +136,11 @@ output[
                       show(REG_SHIFTS[get_shift(fix(roster[reg,d])),6]) ++ sep ++                      
                       dag_end ++ "\n"
                       
-                      |reg in regs, d in 1..days];
+                      |reg = r1, d in 1..days where d mod 7 = wednesday];
                       
-output[  if (d mod 7 = wednesday /\ fix(roster[reg,d]) in {shiftoff})
+                    
+%%FULL TIMER TEEACHING TIME                 
+output[  if (d mod 7 = wednesday /\ fix(roster[reg,d]) in {shiftoff,pftam,5,6,7,8,9,10}   /\ fix(REGISTRARS[reg,FullPartTime]="FT"))
                        then 
                        show(REGISTRARS[reg,emp_num])           ++ sep ++ 
                        show(DATES[d])                          ++ sep ++ 
@@ -115,12 +153,24 @@ output[  if (d mod 7 = wednesday /\ fix(roster[reg,d]) in {shiftoff})
                        show(REG_SHIFTS[trn1217,5])             ++ sep ++
                        show(REG_SHIFTS[trn1217,6])             ++ sep ++
                        dag_end ++ "\n" 
-                       
                        else "" endif 
           
-          | reg in regs,d in 1..days];
-
-
-
-
+          | reg =r1 ,d in 1..days];
+%%PART TIMER TEACHING TIME
+output[  if (d mod 7 = wednesday /\ fix(roster[reg,d]) in {shiftoff,pftam,5,6,7,8,9,10}   /\ fix(REGISTRARS[reg,FullPartTime]="PT"))
+                       then 
+                       show(REGISTRARS[reg,emp_num])           ++ sep ++ 
+                       show(DATES[d])                          ++ sep ++ 
+                       show(area)                              ++ sep ++
+                       show(REG_SHIFTS[trn121430,1])             ++ sep ++
+                       show(REGISTRARS[reg,2])                 ++ sep ++
+                       show(REG_SHIFTS[trn121430,2])             ++ sep ++
+                       show(REG_SHIFTS[trn121430,3])             ++ sep ++
+                       show(REG_SHIFTS[trn121430,4])             ++ sep ++
+                       show(REG_SHIFTS[trn121430,5])             ++ sep ++
+                       show(REG_SHIFTS[trn121430,6])             ++ sep ++
+                       dag_end ++ "\n" 
+                       else "" endif 
+          
+          | reg =r1,d in 1..days];
 

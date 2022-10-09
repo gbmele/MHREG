@@ -10,11 +10,12 @@ enum shifts = {a812,pft812,red812,rt812,a81330,a81430,a81630,pft81630,rt81630,or
                or103012,a112130,trn121430,a1217,trn1217,p132330,ft132330,red132330,rt132330,us132330,p13302330,p142330, 
                ft142330,red142330,rt142330,p1424,trn143017,p14302330,p152330,p172330,ft172330,red172330,rt172330,n230830,leave,off};
 
-set of shifts: RSHIFTS ={off,a81730,p142330,n230830,leave,trn1217};
+%%set of shifts: RSHIFTS ={off,a81730,p142330,n230830,leave,trn1217};
 
 
 
-
+int: shift_description =1;
+int: start = 2;
 
 
 array[shifts,1..6] of var string: REG_SHIFTS = 
