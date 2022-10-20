@@ -42,7 +42,7 @@ function shifts: get_wed_shift(int:sh) =
                      elseif sh = 6 then ft172330
                      elseif sh = 7 then n230830
                      elseif sh = 8 then leave 
-                     %elseif sh = 9 then trn1217
+                     elseif sh = 9 then trn1217
                      elseif sh = 10 then a112130
                      else off
                      endif;
@@ -86,7 +86,8 @@ output[show(roster[reg,day]) ++ " " ++ if day mod 7 = 0 then "||" else "" endif 
 %%%%THE WHOLE ROSTER>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 %%everyday except wednesday
-output[                                    
+output[        if fix(roster[reg,d]) != 0   
+               then                           
                       show(REGISTRARS[reg,emp_num])                    ++ sep ++ 
                       show(DATES[d])                                   ++ sep ++ 
                       show(area)                                       ++ sep ++
@@ -98,12 +99,15 @@ output[
                       show(REG_SHIFTS[get_shift(fix(roster[reg,d])),5]) ++ sep ++
                       show(REG_SHIFTS[get_shift(fix(roster[reg,d])),6]) ++ sep ++                      
                       dag_end ++ "\n"
+               else ""
+               endif
                       
    |reg in regs, d in 1..days where d mod 7 in {monday,tuesday,thursday,friday,saturday,sunday}];
                       
 %%fullroster wednesday_shifts
-output[                                      
-                      show(REGISTRARS[reg,emp_num])                    ++ sep ++ 
+output[        if     fix(roster[reg,d]) != 0                           
+               
+               then   show(REGISTRARS[reg,emp_num])                    ++ sep ++ 
                       show(DATES[d])                                   ++ sep ++ 
                       show(area)                                       ++ sep ++
                       show(REG_SHIFTS[get_wed_shift(fix(roster[reg,d])),1]) ++ sep ++   %SHIft
@@ -115,6 +119,8 @@ output[
                       show(REG_SHIFTS[get_wed_shift(fix(roster[reg,d])),6]) ++ sep ++                      
                       dag_end ++ "\n"
                       
+               else ""
+               endif       
                       |reg in regs, d in 1..days where d mod 7 in  {wednesday}];
 
                       
@@ -162,7 +168,6 @@ output[  if (d mod 7 = wednesday /\ fix(roster[reg,d]) in {0,1,2,3,4,5,6,9}   /\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-/*
 
 output["\n\n\n\n\n\n===========TESTING SHIFTS PRIOR TO AND AFTER TEACHING==========================\n"];
 
@@ -179,7 +184,7 @@ output[
                       show(REG_SHIFTS[get_shift(fix(roster[reg,d])),6]) ++ sep ++                      
                       dag_end ++ "\n"
                       
-                      |reg = r1, d in 1..days where d mod 7 = wednesday];
+                      |reg = r18, d in 1..days where d mod 7 = wednesday];
                       
                     
 %%FULL TIMER TEEACHING TIME                 
@@ -198,7 +203,7 @@ output[  if (d mod 7 = wednesday /\ fix(roster[reg,d]) in {0,1,2,3,4,5,6,9,10}  
                        dag_end ++ "\n" 
                        else "" endif 
           
-          | reg =r1 ,d in 1..days where d mod 7 = wednesday];
+          | reg =r18 ,d in 1..days where d mod 7 = wednesday];
           
 %%PART TIMER TEACHING TIME
 output[  if (d mod 7 = wednesday /\ fix(roster[reg,d]) in {0,1,2,3,4,5,6,9,10}   /\ fix(REGISTRARS[reg,FullPartTime]="PT"))
@@ -216,5 +221,35 @@ output[  if (d mod 7 = wednesday /\ fix(roster[reg,d]) in {0,1,2,3,4,5,6,9,10}  
                        dag_end ++ "\n" 
                        else "" endif 
           
-          | reg =r1,d in 1..days where d mod 7 = wednesday];
-*/
+          | reg =r18,d in 1..days where d mod 7 = wednesday];
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%
+%% test every day 1 doctor
+output ["\n\n\n\n\n\ntest every day 1 doctor\n\n\n"];
+
+
+output[        if fix(roster[reg,d]) != 0   
+               then                           
+                      show(REGISTRARS[reg,emp_num])                    ++ sep ++ 
+                      show(DATES[d])                                   ++ sep ++ 
+                      show(area)                                       ++ sep ++
+                      show(REG_SHIFTS[get_shift(fix(roster[reg,d])),1]) ++ sep ++   %SHIft
+                      show(REGISTRARS[reg,reg_role])                    ++ sep ++
+                      show(REG_SHIFTS[get_shift(fix(roster[reg,d])),2]) ++ sep ++
+                      show(REG_SHIFTS[get_shift(fix(roster[reg,d])),3]) ++ sep ++
+                      show(REG_SHIFTS[get_shift(fix(roster[reg,d])),4]) ++ sep ++
+                      show(REG_SHIFTS[get_shift(fix(roster[reg,d])),5]) ++ sep ++
+                      show(REG_SHIFTS[get_shift(fix(roster[reg,d])),6]) ++ sep ++                      
+                      dag_end ++ "\n"
+               else ""
+               endif
+                      
+   |reg = r18, d in 1..days];
