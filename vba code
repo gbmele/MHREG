@@ -1,0 +1,15 @@
+Required Data   Result     Code
+1            1,2,3,4,5,    =darksider_con(A1:A5)
+2       
+3       
+4       
+5       
+
+Function darksider_con(rng As range) As String
+  Dim cell As range
+  Dim result As String
+  For Each cell In rng
+    result = result & cell.Value & ","
+  Next
+  darksider_con = result
+End Function
