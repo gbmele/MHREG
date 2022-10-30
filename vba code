@@ -17,20 +17,20 @@ End Function
 Sub build_dzn()
 Debug.Print "======================================"
 Debug.Print "array[regs,wk1] of var int: week1=array2d(regs,wk1,[ "
-Debug.Print Sheets("Summary").Range("r_w1").Value
+Debug.Print Sheets("Week 1").Range("r_w1").Value
 Debug.Print "]);"
 
 Debug.Print "array[regs,wk2] of var int: week1=array2d(regs,wk2,[ "
-Debug.Print Sheets("Summary").Range("r_w2").Value
+Debug.Print Sheets("Week 2").Range("r_w2").Value
 Debug.Print "]);"
 
-Debug.Print "array[regs,wk3] of var int: week1=array2d(regs,wk3,[ "
-Debug.Print Sheets("Summary").Range("r_w3").Value
-Debug.Print "]);"
+Debug.Print " array[regs,wk3] of var int: week1=array2d(regs,wk3,[ "
+Debug.Print   Sheets("Week 3").Range("r_w3").Value
+Debug.Print " ]); % end of week 3 "
 
-Debug.Print "array[regs,wk4] of var int: week1=array2d(regs,wk4,[ "
-Debug.Print Sheets("Week 4").Range("r_w4").Value
-Debug.Print "]); % end of week 4"
+Debug.Print " array[regs,wk4] of var int: week1=array2d(regs,wk4,[ "
+Debug.Print   Sheets("Week 4").Range("r_w4").Value
+Debug.Print " ]); % end of week 4"
 
 Debug.Print "array[regs,wk5] of var int: week1=array2d(regs,wk5,[ "
 Debug.Print Sheets("Week 5").Range("r_w5").Value
@@ -56,5 +56,30 @@ Debug.Print Sheets("Week 9").Range("r_w9").Value
 Debug.Print "]); % end of week 9"
 Debug.Print
 
-End Sub
+Debug.Print
+Debug.Print "array[regs,wk10] of var int: week1=array2d(regs,wk10,[ "
+Debug.Print Sheets("Week 10").Range("r_w10").Value
+Debug.Print "]); % end of week 10"
+Debug.Print
 
+Debug.Print
+Debug.Print "array[regs,wk11] of var int: week1=array2d(regs,wk11,[ "
+Debug.Print Sheets("Week 11").Range("r_w11").Value
+Debug.Print "]); % end of week 11"
+Debug.Print
+
+Debug.Print
+Debug.Print "array[regs,wk12] of var int: week1=array2d(regs,wk12,[ "
+Debug.Print Sheets("Week 12").Range("r_w12").Value
+Debug.Print "]); % end of week 12"
+Debug.Print
+
+Debug.Print
+Debug.Print "array[regs,wk13] of var int: week1=array2d(regs,wk13,[ "
+Debug.Print Sheets("Week 12").Range("r_w13").Value
+Debug.Print "]); % end of week 13"
+Debug.Print
+
+
+
+End Sub
