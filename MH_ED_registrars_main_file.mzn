@@ -8,6 +8,7 @@ include "MH_ED_registrars_term1.mzn";
 
 string: new_line = "\n";
 
+
 int: monday     = 1;
 int: tuesday    = 2;
 int: wednesday  = 3;
@@ -15,6 +16,7 @@ int: thursday   = 4;
 int: friday     = 5;
 int: saturday   = 6;
 int: sunday     = 0;
+
 
 enum  regs = {r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20,r21,r22};
 
@@ -29,7 +31,7 @@ function shifts: get_shift(int:sh) =
                  elseif sh = 5 then rt142330
                  elseif sh = 6 then ft142330
                  elseif sh = 7 then n230830
-                 elseif sh = 8 then leave 
+                 elseif sh = 8 then leave   %%annual
                  elseif sh = 81 then study   %%exam
                  elseif sh = 9 then trn1217                    %% if s= 9 /\ FULLTIME then trn1217 elseif shift = 9 /\ PARTTIME then trn 121430
                  elseif sh = 10 then a112130
@@ -48,7 +50,7 @@ function shifts: get_wed_shift(int:sh) =
                  elseif sh = 5 then rt172330
                  elseif sh = 6 then ft172330
                  elseif sh = 7 then n230830
-                 elseif sh = 8 then leave 
+                 elseif sh = 8 then leave     %%annual
                  elseif sh = 81 then study   %%exam
                  %elseif sh = 9 then trn1217
                  elseif sh = 10 then a112130
@@ -59,7 +61,7 @@ function shifts: get_wed_shift(int:sh) =
                  endif;
 
 int: days = 13 * 7;
-array[regs,1..days] of var 0..10: roster;    % var 0..10 are the shift codes
+array[regs,1..days] of var 0..100: roster;    % var 0..10 are the shift codes
 
 constraint forall ( reg in regs, day in wk1  )  (roster[reg,day] = week1  [reg,day] );
 constraint forall ( reg in regs, day in wk2  )  (roster[reg,day] = week2  [reg,day] );
@@ -130,7 +132,7 @@ output[        if     fix(roster[reg,d]) != 0
                       |reg in regs, d in 1..days where d mod 7 in  {wednesday}];
 
                       
-/*                                                                                                                                                                                            
+                                                                                                                                                                        
 %%FULL TIMER TEEACHING TIME                 
 output[  if (d mod 7 = wednesday /\ fix(roster[reg,d]) in {0,1,2,3,4,5,6,9}   /\ fix(REGISTRARS[reg,FullPartTime]="FT"))
                        then 
@@ -165,40 +167,5 @@ output[  if (d mod 7 = wednesday /\ fix(roster[reg,d]) in {0,1,2,3,4,5,6,9}   /\
                        else "" endif 
           
           | reg in regs,d in 1..days];
-*/
-%% the whole teaching in one go....
-array[regs,1..days] of var {trn1217,trn121430}: teaching;
-string: FullTime = "FT";
-string: PartTime = "PT";
-constraint forall(the_reg in regs, day in 1..days where day mod 7 = wednesday)
-
-                 ((REGISTRARS[the_reg,FullPartTime] = FullTime /\ teaching[the_reg,day] = trn1217  ) \/
-                  (REGISTRARS[the_reg,FullPartTime] = PartTime /\ teaching[the_reg,day] = trn121430)  );
-%these two the same so no error
-constraint forall(the_reg in regs, day in 1..days where day mod 7 = wednesday)
-                 
-                 (   if REGISTRARS[the_reg,FullPartTime] = FullTime then teaching[the_reg,day] = trn1217
-                 elseif REGISTRARS[the_reg,FullPartTime] = PartTime then teaching[the_reg,day] = trn121430
-                 
-                 else true
-                 endif);
-                 
-output[  if (day mod 7 = wednesday /\ fix(roster[reg,day]) in {1,2,3,4,5,6,9})
-                       then 
-                       show(REGISTRARS[reg,emp_num])            ++ sep ++ 
-                       show(DATES[day])                           ++ sep ++ 
-                       show(area)                               ++ sep ++
-                       show(REG_SHIFTS[fix(teaching[reg,day]),1])    ++ sep ++
-                       show(REGISTRARS[reg,2])                  ++ sep ++
-                       show(REG_SHIFTS[fix(teaching[reg,day]),2])    ++ sep ++
-                       show(REG_SHIFTS[fix(teaching[reg,day]),3])    ++ sep ++
-                       show(REG_SHIFTS[fix(teaching[reg,day]),4])    ++ sep ++
-                       show(REG_SHIFTS[fix(teaching[reg,day]),5])    ++ sep ++
-                       show(REG_SHIFTS[fix(teaching[reg,day]),6])    ++ sep ++
-                       dag_end ++ "\n"
-                       else "" endif 
           
-          | reg in regs,day in 1..days where day mod 7 = wednesday];
-
-
-output[show(teaching[r,d]) ++ " " | r in regs, d in 1..days where d mod 7 = wednesday];
+output["\n\n"];          
