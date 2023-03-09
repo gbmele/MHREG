@@ -16,7 +16,7 @@ enum shifts = {study,us142330,a812,pft812,red812,rt812,a81330,a81430,a81630,pft8
 
 int: shift_description =1;
 int: start = 2;
-
+int: finish = 3;
 
 array[shifts,1..6] of var string: REG_SHIFTS = 
   array2d(shifts,1..6, 

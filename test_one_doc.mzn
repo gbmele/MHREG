@@ -1,4 +1,4 @@
-int: test_doc = {reg1};
+int: test_doc = r21;
 
 output[                                      
                       show(REGISTRARS[reg,emp_num])                    ++ sep ++ 

@@ -34,13 +34,16 @@ function shifts: get_shift(int:sh) =
                  elseif sh = 8 then leave   %%annual
                  elseif sh = 81 then study   %%exam
                  elseif sh = 9 then trn1217                    %% if s= 9 /\ FULLTIME then trn1217 elseif shift = 9 /\ PARTTIME then trn 121430
+                 elseif sh = 91 then or817
                  elseif sh = 10 then a112130
                  elseif sh = 11 then us81730
                  elseif sh = 14 then us142330
-                 elseif sh = 91 then or817
                  else off
                  endif;
 
+
+%% wednesday shifts for registrar are half shifts around teaching === so 0800-1200 or 1700-2330
+%% teaching shifts are later
 function shifts: get_wed_shift(int:sh) =
                  if     sh = 0 then off       
                  elseif sh = 1 then a812
@@ -52,15 +55,17 @@ function shifts: get_wed_shift(int:sh) =
                  elseif sh = 7 then n230830
                  elseif sh = 8 then leave     %%annual
                  elseif sh = 81 then study   %%exam
-                 %elseif sh = 9 then trn1217
+                 %elseif sh = 9 then trn1217    --- this is done down below
+                 elseif sh = 91 then or817
                  elseif sh = 10 then a112130
                  elseif sh = 11 then us81730
                  elseif sh = 14 then us142330
-                 elseif sh = 91 then or817
                  else off
                  endif;
 
-int: days = 13 * 7;
+int: days = 13 * 7;   %%13 weeks in a term  --- very very rarely there is  12 or 14 weeks!!!!
+
+
 array[regs,1..days] of var 0..100: roster;    % var 0..10 are the shift codes
 
 constraint forall ( reg in regs, day in wk1  )  (roster[reg,day] = week1  [reg,day] );
@@ -169,3 +174,7 @@ output[  if (d mod 7 = wednesday /\ fix(roster[reg,d]) in {0,1,2,3,4,5,6,9}   /\
           | reg in regs,d in 1..days];
           
 output["\n\n"];          
+
+output[show(REGISTRARS[r21,emp_num]) ++ "\n"];
+output[show(roster[r21,day]) ++ " " ++ if day mod 7 = sunday then "\n" else "" endif | day in 1..days];
+
