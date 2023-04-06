@@ -32,6 +32,7 @@ Function darksider_con22(rng As Range) As String
   Dim cell As Range
   Dim result, week_label As String
   Dim counter As Integer
+  Path = "C:\Users\MeleG\Desktop\REGISTRARS_MZN\this_week.txt"
   
   counter = 0
   result = ""
@@ -46,9 +47,13 @@ Function darksider_con22(rng As Range) As String
     If counter Mod 7 = 0 Then result = result & vbCrLf
     
   Next
-  darksider_con22 = result
   Debug.Print result & vbCrLf & "]); % end of week " & week_label & vbCrLf & vbCrLf
   
-  
+  FileNumber = FreeFile
+  Open Path For Append As FileNumber
+  Print #FileNumber, result
+  Close #FileNumber
+  darksider_con22 = result
+
 End Function
 
