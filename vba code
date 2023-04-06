@@ -26,13 +26,14 @@ Debug.Print "]);"
 End Sub
 
 
-
-
 Function darksider_con22(rng As Range) As String
+  'NEED A PATH
+  
+  Path = "C:\Users\MeleG\Desktop\REGISTRARS_MZN\this_week.txt"
+  
   Dim cell As Range
   Dim result, week_label As String
   Dim counter As Integer
-  Path = "C:\Users\MeleG\Desktop\REGISTRARS_MZN\this_week.txt"
   
   counter = 0
   result = ""
@@ -51,7 +52,8 @@ Function darksider_con22(rng As Range) As String
   
   FileNumber = FreeFile
   Open Path For Append As FileNumber
-  Print #FileNumber, result
+  Print #FileNumber, result & vbCrLf & "]); % end of week " & week_label & vbCrLf & vbCrLf
+  
   Close #FileNumber
   darksider_con22 = result
 
