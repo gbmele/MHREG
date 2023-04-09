@@ -31,6 +31,11 @@ array[ regs, 1..3] of var string: REGISTRARS = array2d( regs, 1..3, [
 "53694","12240-B0041-03-Reg21","PT",% james lim,21
 "58919","12240-B0041-03-Reg22","PT",% victoria Ho,22
 
-
-
 ]);
+ 
+%% 9/4/23
+%%   change "PT" to half time =-- or just assume PT is halftime in general
+   
+%%   add "34T" 
+%%
+ie 3 quarter time.
