@@ -1,58 +1,49 @@
-Required Data   Result     Code
-1            1,2,3,4,5,    =darksider_con(A1:A5)
-2       
-3       
-4       
-5       
-
-Function darksider_con(rng As range) As String
-  Dim cell As range
+Function darksider_con(rng As Range) As String
+  Dim cell As Range
   Dim result As String
   For Each cell In rng
     result = result & cell.Value & ","
   Next
   darksider_con = result
 End Function
-
-build the registar array.......
-
-Sub build_dzn()
-Debug.Print "array[ regs, 1..3] of var string: REGISTRARS = array2d( regs, 1..3, ["
-  For i = 1 To 15
-      Debug.Print Cells(i, 1) & "," & Cells(i, 2) & "," & Cells(i, 3) & "," & Cells(i, 4) & "," & Cells(i, 5)
-  Next
-
-Debug.Print "]);"
-End Sub
-
+  
+  
 
 Function darksider_con22(rng As Range) As String
   'NEED A PATH
   
-  Path = "C:\Users\MeleG\Desktop\REGISTRARS_MZN\this_week.txt"
+  text_file_target = "\this_week.txt"
   
-  Dim cell As Range
-  Dim result, week_label As String
-  Dim counter As Integer
   
-  counter = 0
-  result = ""
+  Dim cell              'As Range
+  Dim result, weekLabel 'As String
+  Dim counter           'As Integer
+  
+  'counter = 0
+  'result = ""
   For Each cell In rng
     counter = counter + 1
     If counter = 1 Then
-      week_label = cell.Offset(0, -1)
-      result = result & "array[regs,wk" & week_label & "] of var int: week" & week_label & "=array2d(regs,wk" & week_label & ",[" & vbCrLf
+      
+      weekLabel = cell.Offset(0, -1)   ' put the week number to the left of the first cell in the range
+
+      result = result & "array[regs,wk" & weekLabel & "] of var int: week"
+      result = result & weekLabel & "=array2d(regs,wk" & weekLabel
+      result = result & ",[" & vbCrLf
     End If
     
-    result = result & cell.Value & ","
+    result = result & cell.Value & "," & vbTab
+    
     If counter Mod 7 = 0 Then result = result & vbCrLf
     
-  Next
-  Debug.Print result & vbCrLf & "]); % end of week " & week_label & vbCrLf & vbCrLf
+  Next cell
+  Debug.Print result & vbCrLf & "]); % end of week " & weekLabel & vbCrLf & vbCrLf
   
   FileNumber = FreeFile
-  Open Path For Append As FileNumber
-  Print #FileNumber, result & vbCrLf & "]); % end of week " & week_label & vbCrLf & vbCrLf
+  
+  Open ThisWorkbook.Path & text_file_target For Append As FileNumber
+  
+  Print #FileNumber, result & vbCrLf & "]); % end of week " & weekLabel & vbCrLf & vbCrLf
   
   Close #FileNumber
   darksider_con22 = result
