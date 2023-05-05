@@ -1,14 +1,3 @@
-Function darksider_con(rng As Range) As String
-  Dim cell As Range
-  Dim result As String
-  For Each cell In rng
-    result = result & cell.Value & ","
-  Next
-  darksider_con = result
-End Function
-  
-  
-
 Function darksider_con22(rng As Range) As String
   'NEED A PATH
   
@@ -25,7 +14,7 @@ Function darksider_con22(rng As Range) As String
     counter = counter + 1
     If counter = 1 Then
       
-      weekLabel = cell.Offset(0, -1)   ' put the week number to the left of the first cell in the range
+      weekLabel = cell.Offset(0, -1)   ' put the week number to the left of the first cell in the range ie just the number 1 or 2 or 3
 
       result = result & "array[regs,wk" & weekLabel & "] of var int: week"
       result = result & weekLabel & "=array2d(regs,wk" & weekLabel
@@ -49,4 +38,3 @@ Function darksider_con22(rng As Range) As String
   darksider_con22 = result
 
 End Function
-
