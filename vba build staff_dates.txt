@@ -1,0 +1,86 @@
+Function build_staff(R As Range)
+
+quote = Chr$(34)  ' ie the "
+ 
+
+
+' the 1..3 fields is hardcoded here
+
+result = "array[regs, 1..3] of var string: REGISTRARS = array2d( regs, 1..3, [ "
+result = result & vbCrLf
+
+For rr = 1 To R.Rows.Count
+ 
+   For cc = 1 To R.Columns.Count
+   
+     result = result & quote & R(rr, cc) & quote & ","
+   
+   Next cc
+   
+     result = result & vbCrLf
+
+Next rr
+   
+result = result & " ]);  %% end of building REGISTRAR ARRAY" & vbCrLf
+
+
+
+Debug.Print result
+
+build_staff = result
+End Function
+
+
+
+Function make_dates(rng As Range)
+     Dim result As String
+     Dim ctr As Integer
+     Dim date_str As String
+     
+     result = ""
+     ctr = 0
+     
+     For Each cell In rng
+       cell.NumberFormat = "dd/mm/yyyy"
+       
+       ctr = ctr + 1
+       If ctr = 1 Then
+          result = result & "if     d = 1 then " & Chr(34) & Format(cell.Value, "dd/mm/yyyy") & Chr(34) & vbCrLf
+        Else
+       result = result & "elseif d = " & ctr & " then " & Chr(34) & Format(cell.Value, "dd/mm/yyyy") & Chr(34) & vbCrLf
+        End If
+     Next
+     result = "function string: get_day(days: d) = " & vbCrLf & result
+               
+     result = result & "else " & vbTab & Chr(34) & "nuffin" & Chr(34) & vbCrLf
+     
+     result = result & "endif; % end of the big if"
+          
+    Debug.Print result
+    make_dates = result
+    
+End Function
+
+
+Function build_dates_array(R As Range)
+  quote = Chr$(34)
+  result = "array[int] of var string: DATES = [" & vbCrLf
+
+  For Each cell In R
+    cell.NumberFormat = "dd/mm/yyyy"
+    result = result & quote & cell.Value & quote & "," & vbCrLf
+    
+  Next
+
+result = result & "]); %%end of array"
+
+ Open ThisWorkbook.Path & "\this_month_dates.txt" For Output As #1
+ Print #1, result
+ 
+
+  build_dates_array = result
+
+
+
+End Function
+
