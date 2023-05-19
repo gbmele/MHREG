@@ -1,0 +1,38 @@
+#build rosteron
+
+##D:\G>gawk -f rosteronbuild.txt reg_rosteron.csv term2.csv staff_registrars.csv SHIFTS.csv
+
+
+BEGIN{}
+FILENAME==ARGV[1] {  ROSTER[FNR]= $0 ; next }
+FILENAME==ARGV[2] {  DATES[FNR]=$1 ; next }
+FILENAME==ARGV[3] {  STAFF[FNR] = $0 ; next}
+FILENAME==ARGV[4] {  SHIFTS[FNR] = $0 ; next}
+
+END{
+ for(i=1;i<=length(STAFF);i++){
+       c=split(STAFF[i],ss,",")
+       print ss[1]" "ss[2]
+       empnum[i]   = ss[2]
+       role[i]     = ss[3]
+       fullpart[i] = ss[4]
+       name[i]     = ss[6]
+ }
+ 
+##SHIFTS need to be key value cos of the codes 
+ for (i=1; i <=length(SHIFTS);i++){
+      
+       c = split(SHIFTS[i],temp,",")
+       shift_code[i]=temp[3]       
+ }
+
+## OUTPUT THE ROSTER
+
+ for(i=1;i<=length(ROSTER);i++){
+     c=split(ROSTER[i],LINE,",")
+     print DATES[LINE[1]]" "empnum[LINE[2]]" "shift_code[LINE[3]]
+     }
+x=22
+print "name " name[x] " " empnum[x] " " role[x] " "fullpart[x]
+}
+
